@@ -45,7 +45,7 @@ do
 		if [ -e "$i" ] && [ ! -z "$i" ] && [[ $i != *.bck* ]]
 		then
 			cp -i "$i" "$i".bck
-			echo "NON-COMPRESSED - Archive of "$i" in "$location" completed on $(date)" | tee -a /home/"$whoami"/scripts.log
+			echo "NON-COMPRESSED - Archive of "$i" in "$location" completed on $(date)" | tee -a /home/"$USER"/scripts.log
 		#File doesn't exist and the string is non-zero
 		elif [ ! -e "$i" ] && [ ! -z "$i" ]
 		then
@@ -69,29 +69,33 @@ do
 			echo "A"
 			cp "$i" "$i".bck
 			gzip "$i".bck
-			echo "COMPRESSED - Archive of "$i" in "$location" completed on $(date)" | tee -a /home/"$whoami"/scripts.log
-			gzip -l "$i".bck.gz >> /home/"$whoami"/scripts.log
+			echo "COMPRESSED - Archive of "$i" in "$location" completed on $(date)" | tee -a /home/"$USER"/scripts.log
+			gzip -l "$i".bck.gz >> /home/"$USER"/scripts.log
 
 		# If file* exists and string is not zero and file.bck* already exist
 		elif [[ -e $i ]] && [[ ! -z $i ]] && [[ -e $1.bck || -e $1.bck.gz ]]
 		then
-			echo "B"
-#			if [[ -e $i.bck ]]
-#			then
-#				read -r -p "Since you are compressing "$i", do you want to remove "$i".bck [Y/N]? " response
-#				if [[ response =~ [yY(es)* ]]
-#				then
-#					rm "$i".bck
-#					echo ""$1".bck was removed"
-#				else
-#					echo ""$i".bck was preserved."
-#				fi
-#			fi
-#			cp "$i" "$i".bckz
-#			gzip "$i".bckz
-#			mv "$i".bckz.gz "$i".bck.gz
-#			echo "COMPRESSED - Archive of "$i" completed on $(date)" | tee -a /home/"$whoami"/scripts.log
-#			gzip -l "$i".bck.gz >> /home/"$whoami"/scripts.log
+			echo "B1"
+			if [[ -e $i.bck ]]
+			then
+				echo "B1.1"
+				read -r -p "Since you are compressing "$i", do you want to remove "$i".bck [Y/N]? " response
+				if [[ $response =~ [yY(es)*] ]]
+				then
+					cp "$i" "$i".bck
+					gzip -f "$i".bck
+					echo "COMPRESSED - Archive of "$i" completed on $(date)" | tee -a /home/"$USER"/scripts.log
+					gzip -l "$i".bck.gz >> /home/"$USER"/scripts.log
+					echo ""$1".bck was removed"
+				else
+					cp "$i" "$i".bckz
+					gzip "$i".bckz
+					mv "$i".bckz.gz "$i".bck.gz
+					echo "COMPRESSED - Archive of "$i" completed on $(date)" | tee -a /home/"$USER"/scripts.log
+					gzip -l "$i".bck.gz >> /home/"$USER"/scripts.log
+					echo ""$i".bck was preserved."
+				fi
+			fi
 
 		# If file* doesnt exists and string is not zero
 		elif [ ! -e "$i" ] && [ ! -z "$i" ]
@@ -120,7 +124,7 @@ do
 			base=$(basename "$i" .bck)
 			location=$(pwd "$i")
 			mv "$i" "$location"/"$base"
-			echo "Un-Archive of "$i" to "$location/" , completed on $(date)" | tee -a /home/"$whoami"/scripts.log
+			echo "Un-Archive of "$i" to "$location/" , completed on $(date)" | tee -a /home/"$USER"/scripts.log
 		elif [[ -e $i ]] && [[ "$i" = *.bck.gz ]]
 		then
 			echo ""$i" - Compressed File"
@@ -128,10 +132,10 @@ do
 			base=$(basename "$i" .bck.gz)
 			location=$(pwd "$i")
 			mv $(basename "$i" .gz) "$location"/"$base"
-			echo "Un-Archive of "$i" to "$location"/"$base" , completed on $(date)" | tee -a /home/"$whoami"/scripts.log
+			echo "Un-Archive of "$i" to "$location"/"$base" , completed on $(date)" | tee -a /home/"$USER"/scripts.log
 		elif [[ -e $i ]] && [[ "$i" != *.bck || "$i" != *.bck.gz ]]
 		then
-			echo ""$i" doesnt seem to be a supported file!"
+			echo ""$i" doesnt seem to be a supported file! Please choose "$i".bck or "$i".bck.gz"
 		elif [[ ! -e $i ]]
 		then
 			echo ""$i" doesn't exist. It wasn't restored!"
