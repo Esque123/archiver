@@ -7,6 +7,7 @@ NOTE: Doesnt work with directories yet!
 Usage:
 
   archiver.sh <flag> [file1] [file2] [file3...etc]
+  
   Flags:  -h  Help
           -n  Backup without compression
           -r  Restore
