@@ -5,14 +5,6 @@
 # Kevin Mostert
 # 25/03/2019
 
-#Test to make sure that arguments are entered.
-TYPETEST="$@"
-if [ ! -n "$TYPETEST" ]
-then
-	echo 'Please specify at least one file to backup.'
-	exit 1
-fi
-
 # Flag options
 has_n_option=false
 has_r_option=false
@@ -27,6 +19,24 @@ while getopts :hnr opt; do
 done
 
 shift $(( OPTIND -1 ))
+
+#Test to make sure that arguments are entered.
+TYPETEST="$@"
+if [ ! -n "$TYPETEST" ]
+then
+	echo 'Please specify at least one file to backup.'
+	exit 1
+fi
+
+#Test to make sure that the file is writable
+for i in "$@"
+do
+	if [ ! -w "$i" ]
+	then
+		echo "Write permission is NOT granted on "$i", please run as sudo"
+		exit 1
+	fi
+done
 
 #BACKINGUP
 # For each $1....$n, do
@@ -45,7 +55,7 @@ do
 		if [ -e "$i" ] && [ ! -z "$i" ] && [[ $i != *.bck* ]]
 		then
 			cp -i "$i" "$i".bck
-			echo "NON-COMPRESSED - Archive of "$i" in "$location"/ completed on $(date)." | tee -a /home/"$USER"/scripts.log
+			echo "NON-COMPRESSED - Archive of "$i" in "$location"/ completed on $(date)." | tee -a /home/"$whoami"/scripts.log
 		#File doesn't exist and the string is non-zero
 		elif [ ! -e "$i" ] && [ ! -z "$i" ]
 		then
@@ -68,8 +78,8 @@ do
 		then
 			cp "$i" "$i".bck
 			gzip "$i".bck
-			echo "COMPRESSED - Archive of "$i" in "$location"/ completed on $(date)." | tee -a /home/"$USER"/scripts.log
-			gzip -l "$i".bck.gz >> /home/"$USER"/scripts.log
+			echo "COMPRESSED - Archive of "$i" in "$location"/ completed on $(date)." | tee -a /home/"$whoami"/scripts.log
+			gzip -l "$i".bck.gz >> /home/"$whoami"/scripts.log
 
 		# If file exists and string is not zero and file.bck* already exist
 		elif [[ -e $i ]] && [[ ! -z $i ]] && [[ -e $1.bck || -e $1.bck.gz ]]
@@ -83,15 +93,15 @@ do
 					echo ""$1".bck was removed."
 					cp "$i" "$i".bck
 					gzip -f "$i".bck
-					echo "COMPRESSED - Archive of "$i" to "$location"/ completed on $(date)." | tee -a /home/"$USER"/scripts.log
-					gzip -l "$i".bck.gz >> /home/"$USER"/scripts.log
+					echo "COMPRESSED - Archive of "$i" to "$location"/ completed on $(date)." | tee -a /home/"$whoami"/scripts.log
+					gzip -l "$i".bck.gz >> /home/"$whoami"/scripts.log
 				else
 					echo ""$i".bck was preserved."
 					cp "$i" "$i".bckz
 					gzip "$i".bckz
 					mv "$i".bckz.gz "$i".bck.gz
-					echo "COMPRESSED - Archive of "$i" to "$location"/ completed on $(date)." | tee -a /home/"$USER"/scripts.log
-					gzip -l "$i".bck.gz >> /home/"$USER"/scripts.log
+					echo "COMPRESSED - Archive of "$i" to "$location"/ completed on $(date)." | tee -a /home/"$whoami"/scripts.log
+					gzip -l "$i".bck.gz >> /home/"$whoami"/scripts.log
 				fi
 			fi
 
@@ -122,7 +132,7 @@ do
 			base=$(basename "$i" .bck)
 			location=$(pwd "$i")
 			mv "$i" "$base"
-			echo "Un-Archive of "$i" to "$location/" , completed on $(date)" | tee -a /home/"$USER"/scripts.log
+			echo "Un-Archive of "$i" to "$location/" , completed on $(date)" | tee -a /home/"$whoami"/scripts.log
 		elif [[ -e $i ]] && [[ "$i" = *.bck.gz ]]
 		then
 			echo "Restoring Compressed File - "$i""
@@ -130,7 +140,7 @@ do
 			base=$(basename "$i" .bck.gz)
 			location=$(pwd "$i")
 			mv $(basename "$i" .gz) "$location"/"$base"
-			echo "Un-Archive of "$i" to "$location"/ , completed on $(date)" | tee -a /home/"$USER"/scripts.log
+			echo "Un-Archive of "$i" to "$location"/ , completed on $(date)" | tee -a /home/"$whoami"/scripts.log
 		elif [[ -e $i ]] && [[ "$i" != *.bck || "$i" != *.bck.gz ]]
 		then
 			echo ""$i" doesnt seem to be a supported file! Please choose "$i".bck or "$i".bck.gz"
