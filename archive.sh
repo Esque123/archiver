@@ -4,12 +4,36 @@
 # Kevin Mostert
 # 25/03/2019
 
+#FUNCTIONS:
+
+# Help Function
+function help {
+
+cat << _HELP_
+
+Archive.sh is a script that will quickly make a backup of a file or restore
+a previously backed up file. This is usefull when you are constantly making
+changes to files and tinkering on your system. You can make a quick backup
+and restore it, if need be.
+
+Usage:
+archive.sh [OPTION] <file1> <file2> <file...>
+
+Flags:
+-h	Shows this help message.
+-n	No-compression: Make a non-compresed backup.
+-r	Restore a previously backed up file.
+
+-Kevin Mostert
+_HELP_
+}
+
 # Flag options
 has_n_option=false
 has_r_option=false
 while getopts :hnr opt; do
         case $opt in
-                h) echo "Backup and compress files, skip compression with -n flag and restore with the -r flag."; exit;;
+                h) help; exit;; #echo "Backup and compress files, skip compression with -n flag and restore with the -r flag."; exit;;
                 n) has_n_option=true ;;
 		r) has_r_option=true ;;
 		 :) echo "Missing argument for option -$OPTARG"; exit 1;;
@@ -151,30 +175,5 @@ do
 		fi
 	fi
 done
-
-###	TESTING AREA ##########
-
-#echo "Validating"
-#echo '#################################'
-
-#if [[ $1 == *bck ]]
-#then
-#	echo ""
-#	echo ""$1" is a backup file with "$base" as base"
-#elif [[ $1 != *.bck ]]
-#then
-#	echo ""
-#	echo ""$1" is NOT a backup file"
-#fi
-
-#echo "Base1:$base_file1"
-#echo "Base2:$base_file2"
-#echo "$location/$base"
-#echo "Filei: "$i""
-#echo "File1: $1"
-#echo "File2: $2"
-#echo "File3: $3"
-#echo "R: $has_r_option"
-#echo "N: $has_n_option"
 
 exit 0
